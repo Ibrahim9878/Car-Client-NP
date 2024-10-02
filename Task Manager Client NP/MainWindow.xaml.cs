@@ -6,7 +6,9 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Windows;
 
 namespace Task_Manager_Client_NP;
@@ -55,11 +57,18 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         message.Method = HttpMethod.Put;
         var SelectedItemId = (CarBox.SelectedItem as Car).Id;
         var EditName = ModelBox.Text;
-        message.Content = new StringContent($"{SelectedItemId} {EditName}");
 
+        var content = new
+        {
+            Id = SelectedItemId,
+            Model = EditName
+        };
+
+        message.Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(content), Encoding.UTF8, "application/json");
         var response = await Client.PutAsync(message.RequestUri, message.Content);
         var json = await response.Content.ReadAsStringAsync();
         MessageBox.Show(json);
+        MessageBox.Show("Please Click the Get Button for Refresh The List Of Cars");
     }
 
     private async void POSTButton_Click(object sender, RoutedEventArgs e)

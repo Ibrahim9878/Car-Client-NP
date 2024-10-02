@@ -51,14 +51,22 @@ while (true)
     }
     else if (request.HttpMethod == "PUT")
     {
-        var newCar = Convert.ToString(reader.ReadToEnd());
-        var ID = Convert.ToInt32(newCar.ToString()[0]) - '0';
-        foreach (var car in cars)
+        var newCar = reader.ReadToEnd();
+
+        var car = Newtonsoft.Json.JsonConvert.DeserializeObject<Car>(newCar);
+        if (car is not null)
         {
-            if (ID == car.Id)
-                car.Model = newCar;
+            foreach (var item in cars)
+            {
+                if (car.Id == item.Id)
+                {
+                    item.Model = car.Model; 
+                    writer.WriteLine("Car Edited");
+                    break;
+                }
+            }
         }
-        writer.WriteLine("Car Edited");
+
     }
     writer.Close();
     reader.Close();
